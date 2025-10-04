@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolio</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-brand" id="navBrand">Portfolio</div>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="#home" class="nav-link">Home</a></li>
+          <li><a href="#works" class="nav-link">Works</a></li>
+          <li><a href="#skills" class="nav-link">Skills</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <section id="home" class="hero-section">
+      <div class="hero-container">
+        <div class="hero-image">
+          <img id="profileImage" src="" alt="Profile" />
+        </div>
+        <div class="hero-content">
+          <h1 id="profileName">Loading...</h1>
+          <p class="role-text" id="roleText">Loading...</p>
+          <p class="description" id="profileDescription">Loading...</p>
+          <button class="btn btn-primary" id="showMoreBtn">Show More</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="works" class="works-section">
+      <div class="container">
+        <h2 class="section-title">My Works</h2>
+        <div class="category-buttons">
+          <button class="btn btn-category active" data-category="all">All</button>
+          <button class="btn btn-category" data-category="Poster">Poster</button>
+          <button class="btn btn-category" data-category="Thumbnail">Thumbnail</button>
+          <button class="btn btn-category" data-category="Logo">Logo</button>
+          <button class="btn btn-category" data-category="Business Card">Business Card</button>
+        </div>
+        <div class="works-grid" id="worksGrid">
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" class="skills-section">
+      <div class="container">
+        <h2 class="section-title">My Skills</h2>
+        <div class="skills-list" id="skillsList">
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="contact-section">
+      <div class="container">
+        <h2 class="section-title">Get In Touch</h2>
+        <div class="contact-info">
+          <div class="contact-item">
+            <svg class="contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            <span id="contactEmail">Loading...</span>
+          </div>
+          <div class="contact-item">
+            <svg class="contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+            </svg>
+            <span id="contactPhone">Loading...</span>
+          </div>
+          <div class="contact-item">
+            <svg class="contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span id="contactAddress">Loading...</span>
+          </div>
+        </div>
+        <div class="social-links" id="socialLinks">
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-links" id="footerLinks">
+        </div>
+        <p class="footer-copyright">&copy; <span id="currentYear"></span> <span id="footerName">Portfolio</span>. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <div id="notificationPopup" class="notification-popup hidden">
+      <button class="notification-close" id="notificationClose" aria-label="Close notification">&times;</button>
+      <p class="notification-message" id="notificationMessage"></p>
+      <button class="btn btn-notification" id="notificationCta"></button>
+    </div>
+
+    <script type="module" src="/js/main.js"></script>
+  </body>
+</html>

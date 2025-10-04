@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div id="loginScreen" class="auth-screen">
+      <div class="auth-container">
+        <h1>Admin Login</h1>
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" required />
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" required />
+          </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+          <button type="button" class="btn btn-link" id="forgotPasswordBtn">Forgot Password?</button>
+        </form>
+        <div id="authError" class="error-message"></div>
+      </div>
+    </div>
+
+    <div id="adminDashboard" class="dashboard" style="display: none;">
+      <nav class="admin-nav">
+        <div class="admin-nav-brand">Admin Dashboard</div>
+        <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+      </nav>
+
+      <div class="dashboard-container">
+        <aside class="sidebar">
+          <button class="sidebar-link active" data-section="site-settings">Site Settings</button>
+          <button class="sidebar-link" data-section="works">Works Manager</button>
+          <button class="sidebar-link" data-section="skills">Skills Manager</button>
+          <button class="sidebar-link" data-section="notifications">Notifications</button>
+          <button class="sidebar-link" data-section="footer">Footer & Contact</button>
+        </aside>
+
+        <main class="main-content">
+          <section id="site-settings" class="content-section active">
+            <h2>Site Settings</h2>
+            <form id="siteSettingsForm">
+              <div class="form-group">
+                <label for="siteName">Name</label>
+                <input type="text" id="siteName" required />
+              </div>
+
+              <div class="form-group">
+                <label for="roleText">Role Text</label>
+                <input type="text" id="roleText" placeholder="e.g., I am a Graphics Designer" />
+              </div>
+
+              <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" rows="4"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="profileImage">Profile Image</label>
+                <input type="file" id="profileImage" accept="image/*" />
+                <div id="profileImagePreview" class="image-preview"></div>
+              </div>
+
+              <button type="submit" class="btn btn-primary">Save Settings</button>
+            </form>
+          </section>
+
+          <section id="works" class="content-section">
+            <div class="section-header">
+              <h2>Works Manager</h2>
+              <button class="btn btn-primary" id="addWorkBtn">Add New Work</button>
+            </div>
+            <div id="worksList" class="items-list"></div>
+
+            <div id="workModal" class="modal">
+              <div class="modal-content">
+                <button class="modal-close" id="closeWorkModal">&times;</button>
+                <h3 id="workModalTitle">Add Work</h3>
+                <form id="workForm">
+                  <input type="hidden" id="workId" />
+
+                  <div class="form-group">
+                    <label for="workTitle">Title</label>
+                    <input type="text" id="workTitle" required />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="workCategory">Category</label>
+                    <select id="workCategory" required>
+                      <option value="Poster">Poster</option>
+                      <option value="Thumbnail">Thumbnail</option>
+                      <option value="Logo">Logo</option>
+                      <option value="Business Card">Business Card</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="workDescription">Description</label>
+                    <textarea id="workDescription" rows="3"></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="workImages">Images</label>
+                    <input type="file" id="workImages" accept="image/*" multiple />
+                    <div id="workImagesPreview" class="image-preview-grid"></div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="workProjectUrl">Project Link</label>
+                    <input type="url" id="workProjectUrl" placeholder="https://" />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="workVisible" checked />
+                      Visible
+                    </label>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="workOrder">Order</label>
+                    <input type="number" id="workOrder" value="0" />
+                  </div>
+
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Work</button>
+                    <button type="button" class="btn btn-secondary" id="cancelWorkBtn">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <section id="skills" class="content-section">
+            <div class="section-header">
+              <h2>Skills Manager</h2>
+              <button class="btn btn-primary" id="addSkillBtn">Add New Skill</button>
+            </div>
+            <div id="skillsList" class="items-list"></div>
+
+            <div id="skillModal" class="modal">
+              <div class="modal-content">
+                <button class="modal-close" id="closeSkillModal">&times;</button>
+                <h3 id="skillModalTitle">Add Skill</h3>
+                <form id="skillForm">
+                  <input type="hidden" id="skillId" />
+
+                  <div class="form-group">
+                    <label for="skillName">Skill Name</label>
+                    <input type="text" id="skillName" required />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="skillPercent">Percent (0-100)</label>
+                    <input type="number" id="skillPercent" min="0" max="100" required />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="skillOrder">Order</label>
+                    <input type="number" id="skillOrder" value="0" />
+                  </div>
+
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Skill</button>
+                    <button type="button" class="btn btn-secondary" id="cancelSkillBtn">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <section id="notifications" class="content-section">
+            <div class="section-header">
+              <h2>Notifications</h2>
+              <button class="btn btn-primary" id="addNotificationBtn">Add Notification</button>
+            </div>
+            <div id="notificationsList" class="items-list"></div>
+
+            <div id="notificationModal" class="modal">
+              <div class="modal-content">
+                <button class="modal-close" id="closeNotificationModal">&times;</button>
+                <h3 id="notificationModalTitle">Add Notification</h3>
+                <form id="notificationForm">
+                  <input type="hidden" id="notificationId" />
+
+                  <div class="form-group">
+                    <label for="notificationMessage">Message</label>
+                    <textarea id="notificationMessage" rows="3" required></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="notificationCtaLabel">Button Text</label>
+                    <input type="text" id="notificationCtaLabel" required />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="notificationCtaUrl">Button URL</label>
+                    <input type="url" id="notificationCtaUrl" placeholder="https://" required />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="notificationActive" checked />
+                      Active
+                    </label>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="notificationStartAt">Start Date/Time (optional)</label>
+                    <input type="datetime-local" id="notificationStartAt" />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="notificationEndAt">End Date/Time (optional)</label>
+                    <input type="datetime-local" id="notificationEndAt" />
+                  </div>
+
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Notification</button>
+                    <button type="button" class="btn btn-secondary" id="cancelNotificationBtn">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <section id="footer" class="content-section">
+            <h2>Footer & Contact</h2>
+            <form id="footerContactForm">
+              <h3>Contact Information</h3>
+              <div class="form-group">
+                <label for="contactEmail">Email</label>
+                <input type="email" id="contactEmail" />
+              </div>
+
+              <div class="form-group">
+                <label for="contactPhone">Phone</label>
+                <input type="tel" id="contactPhone" />
+              </div>
+
+              <div class="form-group">
+                <label for="contactAddress">Address</label>
+                <input type="text" id="contactAddress" />
+              </div>
+
+              <h3>Footer Links</h3>
+              <div id="footerLinksList"></div>
+              <button type="button" class="btn btn-secondary" id="addFooterLinkBtn">Add Link</button>
+
+              <h3>Social Links</h3>
+              <div id="socialLinksList"></div>
+              <button type="button" class="btn btn-secondary" id="addSocialLinkBtn">Add Social Link</button>
+
+              <button type="submit" class="btn btn-primary">Save Footer & Contact</button>
+            </form>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+      <div class="loading-spinner"></div>
+    </div>
+
+    <script type="module" src="/js/admin.js"></script>
+  </body>
+</html>
