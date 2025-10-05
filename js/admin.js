@@ -1,4 +1,4 @@
-import { auth, db, storage } from './firebase-config.js';
+import { auth, db } from './firebase-config.js';
 import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
@@ -18,10 +18,8 @@ import {
   deleteDoc,
   Timestamp
 } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 let currentUser = null;
-let uploadedImageUrls = [];
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
@@ -130,12 +128,6 @@ async function loadAllData() {
   await loadFooterContact();
 }
 
-async function uploadImage(file, path) {
-  const storageRef = ref(storage, `${path}/${Date.now()}_${file.name}`);
-  const snapshot = await uploadBytes(storageRef, file);
-  return await getDownloadURL(snapshot.ref);
-}
-
 async function loadSiteSettings() {
   try {
     const docRef = doc(db, 'siteSettings', 'main');
@@ -146,6 +138,7 @@ async function loadSiteSettings() {
       document.getElementById('siteName').value = data.name || '';
       document.getElementById('roleText').value = data.roleText || '';
       document.getElementById('description').value = data.description || '';
+      document.getElementById('profileImageUrl').value = data.profileImageUrl || '';
 
       if (data.profileImageUrl) {
         const preview = document.getElementById('profileImagePreview');
@@ -162,17 +155,17 @@ document.getElementById('siteSettingsForm').addEventListener('submit', async (e)
   showLoading();
 
   try {
+    const profileImageUrl = document.getElementById('profileImageUrl').value;
     const data = {
       name: document.getElementById('siteName').value,
       roleText: document.getElementById('roleText').value,
-      description: document.getElementById('description').value
+      description: document.getElementById('description').value,
+      profileImageUrl: profileImageUrl
     };
 
-    const profileImageFile = document.getElementById('profileImage').files[0];
-    if (profileImageFile) {
-      data.profileImageUrl = await uploadImage(profileImageFile, 'profile');
+    if (profileImageUrl) {
       const preview = document.getElementById('profileImagePreview');
-      preview.innerHTML = `<img src="${data.profileImageUrl}" alt="Profile" />`;
+      preview.innerHTML = `<img src="${profileImageUrl}" alt="Profile" />`;
     }
 
     await setDoc(doc(db, 'siteSettings', 'main'), data, { merge: true });
@@ -184,15 +177,11 @@ document.getElementById('siteSettingsForm').addEventListener('submit', async (e)
   hideLoading();
 });
 
-document.getElementById('profileImage').addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const preview = document.getElementById('profileImagePreview');
-      preview.innerHTML = `<img src="${e.target.result}" alt="Preview" />`;
-    };
-    reader.readAsDataURL(file);
+document.getElementById('profileImageUrl').addEventListener('input', (e) => {
+  const url = e.target.value;
+  if (url) {
+    const preview = document.getElementById('profileImagePreview');
+    preview.innerHTML = `<img src="${url}" alt="Preview" />`;
   }
 });
 
@@ -231,7 +220,6 @@ document.getElementById('addWorkBtn').addEventListener('click', () => {
   document.getElementById('workForm').reset();
   document.getElementById('workId').value = '';
   document.getElementById('workImagesPreview').innerHTML = '';
-  uploadedImageUrls = [];
   document.getElementById('workModal').classList.add('active');
 });
 
@@ -243,19 +231,11 @@ document.getElementById('cancelWorkBtn').addEventListener('click', () => {
   document.getElementById('workModal').classList.remove('active');
 });
 
-document.getElementById('workImages').addEventListener('change', async (e) => {
-  const files = Array.from(e.target.files);
-  const preview = document.getElementById('workImagesPreview');
-  preview.innerHTML = '';
-
-  for (const file of files) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = document.createElement('img');
-      img.src = e.target.result;
-      preview.appendChild(img);
-    };
-    reader.readAsDataURL(file);
+document.getElementById('workImageUrl').addEventListener('input', (e) => {
+  const url = e.target.value;
+  if (url) {
+    const preview = document.getElementById('workImagesPreview');
+    preview.innerHTML = `<img src="${url}" alt="Preview" />`;
   }
 });
 
@@ -265,6 +245,8 @@ document.getElementById('workForm').addEventListener('submit', async (e) => {
 
   try {
     const workId = document.getElementById('workId').value;
+    const imageUrl = document.getElementById('workImageUrl').value;
+
     const data = {
       title: document.getElementById('workTitle').value,
       category: document.getElementById('workCategory').value,
@@ -274,14 +256,8 @@ document.getElementById('workForm').addEventListener('submit', async (e) => {
       order: parseInt(document.getElementById('workOrder').value)
     };
 
-    const imageFiles = document.getElementById('workImages').files;
-    if (imageFiles.length > 0) {
-      const imageUrls = [];
-      for (const file of imageFiles) {
-        const url = await uploadImage(file, 'works');
-        imageUrls.push(url);
-      }
-      data.imageUrls = imageUrls;
+    if (imageUrl) {
+      data.imageUrls = [imageUrl];
     }
 
     if (workId) {
@@ -315,10 +291,9 @@ window.editWork = async (workId) => {
       document.getElementById('workOrder').value = work.order;
 
       if (work.imageUrls && work.imageUrls.length > 0) {
+        document.getElementById('workImageUrl').value = work.imageUrls[0];
         const preview = document.getElementById('workImagesPreview');
-        preview.innerHTML = work.imageUrls.map(url =>
-          `<img src="${url}" alt="Work image" />`
-        ).join('');
+        preview.innerHTML = `<img src="${work.imageUrls[0]}" alt="Work image" />`;
       }
 
       document.getElementById('workModal').classList.add('active');
