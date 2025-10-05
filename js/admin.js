@@ -29,12 +29,12 @@ onAuthStateChanged(auth, async (user) => {
       showDashboard();
       loadAllData();
     } else {
-       showDashboard();
-      loadAllData();
+      showLoginScreen();
+      showError('You do not have admin privileges.');
+      await signOut(auth);
     }
   } else {
-    showDashboard();
-      loadAllData();
+    showLoginScreen();
   }
 });
 
