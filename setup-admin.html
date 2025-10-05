@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Setup</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+      }
+
+      .setup-container {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        width: 100%;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .info-box {
+        background: #e8f4fd;
+        border-left: 4px solid #2196F3;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border-radius: 4px;
+      }
+
+      .info-box p {
+        color: #555;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 0.5rem;
+      }
+
+      .info-box strong {
+        color: #2196F3;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .message {
+        padding: 1rem;
+        margin-top: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 500;
+      }
+
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .steps {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 1rem;
+        margin-top: 1rem;
+        border-radius: 4px;
+      }
+
+      .steps ol {
+        margin-left: 1.5rem;
+        color: #555;
+      }
+
+      .steps li {
+        margin-bottom: 0.5rem;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="setup-container">
+      <h1>Admin Setup</h1>
+
+      <div class="info-box">
+        <p><strong>First Time Setup:</strong></p>
+        <p>This page will help you register yourself as an admin. You only need to do this once.</p>
+      </div>
+
+      <form id="setupForm">
+        <div class="form-group">
+          <label for="email">Admin Email</label>
+          <input type="email" id="email" required placeholder="Enter your email" />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Admin Password</label>
+          <input type="password" id="password" required placeholder="Enter your password" minlength="6" />
+        </div>
+
+        <div class="form-group">
+          <label for="displayName">Display Name</label>
+          <input type="text" id="displayName" required placeholder="Your name" />
+        </div>
+
+        <button type="submit" class="btn" id="submitBtn">Create Admin Account</button>
+      </form>
+
+      <div id="message"></div>
+
+      <div class="steps">
+        <strong>After Setup:</strong>
+        <ol>
+          <li>Your admin account will be created in Firebase Authentication</li>
+          <li>Your admin role will be saved in Firestore</li>
+          <li>You can then login at <strong>/admin.html</strong></li>
+          <li>Delete this setup page for security</li>
+        </ol>
+      </div>
+    </div>
+
+    <script type="module">
+      import { auth, db } from './js/firebase-config.js';
+      import { createUserWithEmailAndPassword } from 'firebase/auth';
+      import { doc, setDoc } from 'firebase/firestore';
+
+      const form = document.getElementById('setupForm');
+      const messageDiv = document.getElementById('message');
+      const submitBtn = document.getElementById('submitBtn');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const displayName = document.getElementById('displayName').value;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating...';
+        messageDiv.innerHTML = '';
+
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+
+          await setDoc(doc(db, 'admins', user.uid), {
+            role: 'admin',
+            email: email,
+            displayName: displayName,
+            createdAt: new Date().toISOString()
+          });
+
+          messageDiv.innerHTML = `
+            <div class="message success">
+              <strong>Success!</strong><br>
+              Admin account created successfully!<br>
+              You can now <a href="/admin.html">login to admin panel</a>.<br><br>
+              <strong>Important:</strong> Delete this setup page (setup-admin.html) for security.
+            </div>
+          `;
+
+          form.reset();
+          submitBtn.textContent = 'Account Created!';
+
+        } catch (error) {
+          let errorMessage = error.message;
+
+          if (error.code === 'auth/email-already-in-use') {
+            try {
+              const existingUser = auth.currentUser;
+              if (existingUser) {
+                await setDoc(doc(db, 'admins', existingUser.uid), {
+                  role: 'admin',
+                  email: email,
+                  displayName: displayName,
+                  createdAt: new Date().toISOString()
+                });
+
+                messageDiv.innerHTML = `
+                  <div class="message success">
+                    <strong>Success!</strong><br>
+                    Admin role added to existing account!<br>
+                    You can now <a href="/admin.html">login to admin panel</a>.
+                  </div>
+                `;
+                submitBtn.textContent = 'Role Added!';
+                return;
+              } else {
+                errorMessage = 'Email already exists. Please login with that account first, then run this setup again.';
+              }
+            } catch (err) {
+              errorMessage = 'Email already exists. Please use a different email or login with that account first.';
+            }
+          }
+
+          messageDiv.innerHTML = `
+            <div class="message error">
+              <strong>Error:</strong><br>${errorMessage}
+            </div>
+          `;
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Create Admin Account';
+        }
+      });
+    </script>
+  </body>
+</html>
