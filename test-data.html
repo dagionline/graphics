@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Firebase Data</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4; }
+    pre { background: #252526; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    h2 { color: #4ec9b0; }
+  </style>
+</head>
+<body>
+  <h2>Firebase Data Test</h2>
+  <button onclick="testData()">Load All Data</button>
+  <div id="output"></div>
+
+  <script type="module">
+    import { db } from './js/firebase-config.js';
+    import { collection, getDocs } from 'firebase/firestore';
+
+    window.testData = async function() {
+      const output = document.getElementById('output');
+      output.innerHTML = '<p>Loading...</p>';
+      
+      try {
+        const works = [];
+        const worksSnapshot = await getDocs(collection(db, 'works'));
+        worksSnapshot.forEach(doc => {
+          works.push({ id: doc.id, ...doc.data() });
+        });
+
+        const notifications = [];
+        const notifSnapshot = await getDocs(collection(db, 'notifications'));
+        notifSnapshot.forEach(doc => {
+          notifications.push({ id: doc.id, ...doc.data() });
+        });
+
+        output.innerHTML = `
+          <h3>Works (${works.length} total)</h3>
+          <pre>${JSON.stringify(works, null, 2)}</pre>
+          
+          <h3>Notifications (${notifications.length} total)</h3>
+          <pre>${JSON.stringify(notifications, null, 2)}</pre>
+        `;
+      } catch (error) {
+        output.innerHTML = `<pre style="color: #f48771">Error: ${error.message}\n${error.stack}</pre>`;
+      }
+    };
+  </script>
+</body>
+</html>
