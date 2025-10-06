@@ -49,13 +49,16 @@ async function loadSiteSettings() {
 async function loadWorks() {
   try {
     const worksRef = collection(db, 'works');
-    const q = query(worksRef, where('visible', '==', true), orderBy('order', 'asc'));
+    const q = query(worksRef);
 
     onSnapshot(q, (snapshot) => {
-      allWorks = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      allWorks = snapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        .filter(work => work.visible === true)
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
       displayWorks();
     });
   } catch (error) {
@@ -91,13 +94,15 @@ function displayWorks() {
 async function loadSkills() {
   try {
     const skillsRef = collection(db, 'skills');
-    const q = query(skillsRef, orderBy('order', 'asc'));
+    const q = query(skillsRef);
 
     onSnapshot(q, (snapshot) => {
-      const skills = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const skills = snapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
 
       const skillsList = document.getElementById('skillsList');
       skillsList.innerHTML = skills.map((skill, index) => `
@@ -166,14 +171,20 @@ function setupNotifications() {
   const dismissedNotifications = JSON.parse(localStorage.getItem('dismissedNotifications') || '[]');
 
   const notificationsRef = collection(db, 'notifications');
-  const q = query(notificationsRef, where('active', '==', true), orderBy('createdAt', 'desc'));
+  const q = query(notificationsRef);
 
   onSnapshot(q, (snapshot) => {
-    snapshot.docs.forEach(docSnap => {
-      const notification = docSnap.data();
-      const notificationId = docSnap.id;
+    const notifications = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(notification => notification.active === true)
+      .sort((a, b) => {
+        const aTime = a.createdAt?.toMillis() || 0;
+        const bTime = b.createdAt?.toMillis() || 0;
+        return bTime - aTime;
+      });
 
-      if (dismissedNotifications.includes(notificationId)) {
+    notifications.forEach(notification => {
+      if (dismissedNotifications.includes(notification.id)) {
         return;
       }
 
@@ -184,7 +195,7 @@ function setupNotifications() {
       if (startAt && now < startAt) return;
       if (endAt && now > endAt) return;
 
-      showNotificationPopup(notification, notificationId);
+      showNotificationPopup(notification, notification.id);
     });
   });
 }
