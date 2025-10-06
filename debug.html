@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug - Firebase Data</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+    }
+    h1 { color: #4ec9b0; }
+    h2 { color: #dcdcaa; margin-top: 30px; }
+    .data {
+      background: #252526;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 10px 0;
+      border-left: 3px solid #007acc;
+    }
+    .error {
+      background: #5a1d1d;
+      border-left-color: #f48771;
+    }
+    .success {
+      background: #1e3a1e;
+      border-left-color: #89d185;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Firebase Data Debug</h1>
+
+  <h2>Site Settings (siteSettings/main)</h2>
+  <div id="siteSettings" class="data">Loading...</div>
+
+  <h2>Works Collection</h2>
+  <div id="works" class="data">Loading...</div>
+
+  <h2>Skills Collection</h2>
+  <div id="skills" class="data">Loading...</div>
+
+  <script type="module">
+    import { db } from './js/firebase-config.js';
+    import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
+
+    async function debugSiteSettings() {
+      try {
+        const docRef = doc(db, 'siteSettings', 'main');
+        const docSnap = await getDoc(docRef);
+
+        const div = document.getElementById('siteSettings');
+        if (docSnap.exists()) {
+          div.className = 'data success';
+          div.innerHTML = '<strong>✓ Document found!</strong><br><pre>' +
+            JSON.stringify(docSnap.data(), null, 2) + '</pre>';
+        } else {
+          div.className = 'data error';
+          div.innerHTML = '<strong>✗ Document not found!</strong><br>' +
+            'Please create a document with ID "main" in the "siteSettings" collection from the admin panel.';
+        }
+      } catch (error) {
+        document.getElementById('siteSettings').className = 'data error';
+        document.getElementById('siteSettings').innerHTML =
+          '<strong>Error:</strong><br><pre>' + error.message + '</pre>';
+      }
+    }
+
+    async function debugWorks() {
+      try {
+        const worksRef = collection(db, 'works');
+        const snapshot = await getDocs(worksRef);
+
+        const div = document.getElementById('works');
+        if (snapshot.empty) {
+          div.className = 'data error';
+          div.innerHTML = '<strong>✗ No works found!</strong><br>' +
+            'Please add some works from the admin panel.';
+        } else {
+          div.className = 'data success';
+          const works = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          div.innerHTML = '<strong>✓ Found ' + works.length + ' works!</strong><br><pre>' +
+            JSON.stringify(works, null, 2) + '</pre>';
+        }
+      } catch (error) {
+        document.getElementById('works').className = 'data error';
+        document.getElementById('works').innerHTML =
+          '<strong>Error:</strong><br><pre>' + error.message + '</pre>';
+      }
+    }
+
+    async function debugSkills() {
+      try {
+        const skillsRef = collection(db, 'skills');
+        const snapshot = await getDocs(skillsRef);
+
+        const div = document.getElementById('skills');
+        if (snapshot.empty) {
+          div.className = 'data error';
+          div.innerHTML = '<strong>✗ No skills found!</strong><br>' +
+            'Please add some skills from the admin panel.';
+        } else {
+          div.className = 'data success';
+          const skills = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          div.innerHTML = '<strong>✓ Found ' + skills.length + ' skills!</strong><br><pre>' +
+            JSON.stringify(skills, null, 2) + '</pre>';
+        }
+      } catch (error) {
+        document.getElementById('skills').className = 'data error';
+        document.getElementById('skills').innerHTML =
+          '<strong>Error:</strong><br><pre>' + error.message + '</pre>';
+      }
+    }
+
+    debugSiteSettings();
+    debugWorks();
+    debugSkills();
+  </script>
+</body>
+</html>
