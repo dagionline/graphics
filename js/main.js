@@ -204,7 +204,6 @@ function showNotificationPopup(notification, notificationId) {
   const popup = document.getElementById('notificationPopup');
   const message = document.getElementById('notificationMessage');
   const ctaButton = document.getElementById('notificationCta');
-  const closeButton = document.getElementById('notificationClose');
 
   message.textContent = notification.message;
   ctaButton.textContent = notification.ctaLabel || 'Learn More';
@@ -216,11 +215,19 @@ function showNotificationPopup(notification, notificationId) {
     dismissNotification(notificationId);
   };
 
-  closeButton.onclick = () => {
-    dismissNotification(notificationId);
-  };
-
   popup.classList.remove('hidden');
+
+  if (notification.endAt) {
+    const endTime = notification.endAt.toDate().getTime();
+    const now = Date.now();
+    const timeRemaining = endTime - now;
+
+    if (timeRemaining > 0) {
+      setTimeout(() => {
+        dismissNotification(notificationId);
+      }, timeRemaining);
+    }
+  }
 }
 
 function dismissNotification(notificationId) {
