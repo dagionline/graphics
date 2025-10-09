@@ -538,9 +538,11 @@ window.editNotification = async (notificationId) => {
 };
 
 window.deleteNotification = async (notificationId) => {
-  if (confirm('Are you sure you want to delete this notification?')) {
+  if (confirm('Are you sure you want to delete this notification? This will also clear it from all users who have viewed it.')) {
     showLoading();
     try {
+      localStorage.removeItem(`notification_viewed_${notificationId}`);
+
       await deleteDoc(doc(db, 'notifications', notificationId));
       await loadNotifications();
       alert('Notification deleted successfully!');
@@ -659,4 +661,17 @@ document.getElementById('footerContactForm').addEventListener('submit', async (e
   }
 
   hideLoading();
+});
+
+document.getElementById('clearAllNotificationsBtn').addEventListener('click', () => {
+  if (confirm('This will clear all notification views from all users. Users will see active notifications again. Continue?')) {
+    const keys = Object.keys(localStorage);
+    const notificationKeys = keys.filter(key => key.startsWith('notification_viewed_'));
+
+    notificationKeys.forEach(key => {
+      localStorage.removeItem(key);
+    });
+
+    alert(`Cleared ${notificationKeys.length} notification view(s) from this browser.`);
+  }
 });

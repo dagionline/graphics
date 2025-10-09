@@ -168,8 +168,6 @@ function setupNavigation() {
 }
 
 function setupNotifications() {
-  const dismissedNotifications = JSON.parse(localStorage.getItem('dismissedNotifications') || '[]');
-
   const notificationsRef = collection(db, 'notifications');
   const q = query(notificationsRef);
 
@@ -184,7 +182,10 @@ function setupNotifications() {
       });
 
     notifications.forEach(notification => {
-      if (dismissedNotifications.includes(notification.id)) {
+      const viewedKey = `notification_viewed_${notification.id}`;
+      const hasViewed = localStorage.getItem(viewedKey);
+
+      if (hasViewed) {
         return;
       }
 
@@ -209,37 +210,20 @@ function showNotificationPopup(notification, notificationId) {
   ctaButton.textContent = notification.ctaLabel || 'Learn More';
 
   ctaButton.onclick = () => {
+    const viewedKey = `notification_viewed_${notificationId}`;
+    localStorage.setItem(viewedKey, 'true');
+
     if (notification.ctaUrl) {
       window.open(notification.ctaUrl, '_blank');
     }
-    dismissNotification(notificationId);
+
+    popup.classList.add('hidden');
   };
 
   popup.classList.remove('hidden');
 
-  if (notification.endAt) {
-    const endTime = notification.endAt.toDate().getTime();
-    const now = Date.now();
-    const timeRemaining = endTime - now;
-
-    if (timeRemaining > 0) {
-      setTimeout(() => {
-        dismissNotification(notificationId);
-      }, timeRemaining);
-    }
-  }
 }
 
-function dismissNotification(notificationId) {
-  const popup = document.getElementById('notificationPopup');
-  popup.classList.add('hidden');
-
-  const dismissedNotifications = JSON.parse(localStorage.getItem('dismissedNotifications') || '[]');
-  if (!dismissedNotifications.includes(notificationId)) {
-    dismissedNotifications.push(notificationId);
-    localStorage.setItem('dismissedNotifications', JSON.stringify(dismissedNotifications));
-  }
-}
 
 document.getElementById('currentYear').textContent = new Date().getFullYear();
 
